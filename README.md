@@ -15,13 +15,11 @@ Based on [LakeSNES](https://github.com/elzo-d/LakeSnes). It also has some bug fi
 - [X] PPU
 - [X] SPC700 & DSP
 - [X] Controller
-- Cartridge
+- [X] Cartridge
   - [X] LoROM
   - [X] HiROM
   - [X] Read `.srm` data (only 0x2000)
-- NTSC only
-  - PAL, Dendy is not supported yet.
-- Enhancement chip (ToDO)
+- [ ] Enhancement chip (ToDO)
   - [ ] SuperFX
   - [ ] CX4
   - [ ] DSP-X (DSP-1, DSP-2, DSP-3, DSP-4)
@@ -34,6 +32,10 @@ Based on [LakeSNES](https://github.com/elzo-d/LakeSnes). It also has some bug fi
   - [ ] SA1
   - [ ] SPC7110
   - [ ] ST (ST010, ST011, ST018)
+- [ ] Encoding system
+  - [X] NTSC
+  - [ ] PAL
+
 
 ## Key binding
 
