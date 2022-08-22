@@ -171,8 +171,6 @@ func (console *Console) RRead(addr uint32) byte {
 			return console.RAM[addr]
 		case addr >= 0x2100 && addr < 0x2200:
 			return console.ReadBBus(byte(addr & 0xFF))
-		case addr >= 0x2200 && addr < 0x2300:
-			return console.Cartridge.coprocessor.Read(addr)
 		case addr == 0x4016:
 			return console.Controller1.Read() | (console.openBus & 0xFC)
 		case addr == 0x4017:
@@ -181,8 +179,6 @@ func (console *Console) RRead(addr uint32) byte {
 			return console.ReadReg(uint16(addr))
 		case addr >= 0x4300 && addr < 0x4380:
 			return console.DMA.Read(uint16(addr))
-		case addr >= 0x8000 && addr <= 0xFFFF:
-			return console.Cartridge.Read(bank, uint16(addr))
 		}
 	}
 
@@ -212,8 +208,6 @@ func (console *Console) Write(addr uint32, value byte) {
 			console.WriteReg(uint16(addr), value)
 		case addr >= 0x4300 && addr < 0x4380:
 			console.DMA.Write(uint16(addr), value)
-		case addr >= 0x8000 && addr <= 0xFFFF:
-			console.Cartridge.Write(bank, uint16(addr), value)
 		}
 	}
 
@@ -418,8 +412,10 @@ func (console *Console) runCycle() {
 	console.Controller1.Cycle()
 	console.Controller2.Cycle()
 	// if not in dram refresh, if we are busy with hdma/dma, do that, else do cpu cycle
-	if !console.DMA.Cycle() {
-		console.runCPU()
+	if console.hPos < 536 || console.hPos >= 576 {
+		if !console.DMA.Cycle() {
+			console.runCPU()
+		}
 	}
 
 	// check for h/v timer irq's

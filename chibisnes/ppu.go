@@ -739,7 +739,7 @@ func (ppu *PPU) evaluateSprites(line int) {
 		var y byte = byte(ppu.oam[index] >> 8)
 		// check if the sprite is on this line and get the sprite size
 		// WARNING: convert to signed int after calculated by unsinged int.
-		var row int = int(byte(line) - y)
+		var row byte = byte(line) - y
 		var spriteSize int = spriteSizes[ppu.objSize][(ppu.highOAM[index>>3]>>((index&7)+1))&1]
 		var spriteHeight int
 		if ppu.objInterlace {
@@ -747,7 +747,7 @@ func (ppu *PPU) evaluateSprites(line int) {
 		} else {
 			spriteHeight = spriteSize
 		}
-		if row >= 0 && row < spriteHeight {
+		if int(row) < spriteHeight {
 			// in y-range, get the x location, using the high bit as well
 			var x int = int(ppu.oam[index] & 0xff)
 			x |= ((int(ppu.highOAM[index>>3]) >> (int(index) & 7)) & 1) << 8
@@ -775,7 +775,7 @@ func (ppu *PPU) evaluateSprites(line int) {
 				var palette int = (int(ppu.oam[index+1]) & 0xe00) >> 9
 				var hFlipped bool = (ppu.oam[index+1] & 0x4000) > 0
 				if (ppu.oam[index+1] & 0x8000) > 0 {
-					row = spriteSize - 1 - row
+					row = byte(spriteSize) - 1 - row
 				}
 				// fetch all tiles in x-range
 				for col := 0; col < spriteSize; col += 8 {

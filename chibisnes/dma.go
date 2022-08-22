@@ -182,7 +182,8 @@ func (dma *DMA) doDMA() {
 	}
 	// do channel i
 	dma.transferByte(
-		dma.channels[i].aAddr, dma.channels[i].aBank,
+		dma.channels[i].aAddr,
+		dma.channels[i].aBank,
 		dma.channels[i].bAddr+byte(bAddrOffsets[dma.channels[i].mode][dma.channels[i].offIndex]),
 		dma.channels[i].fromB)
 	dma.channels[i].offIndex++
@@ -253,13 +254,15 @@ func (dma *DMA) doHDMA() {
 					dma.hdmaTimer += 8 // 8 cycles for each byte transferred
 					if dma.channels[i].indirect {
 						dma.transferByte(
-							dma.channels[i].size, dma.channels[i].indBank,
+							dma.channels[i].size,
+							dma.channels[i].indBank,
 							dma.channels[i].bAddr+byte(bAddrOffsets[dma.channels[i].mode][j]),
 							dma.channels[i].fromB)
 						dma.channels[i].size++
 					} else {
 						dma.transferByte(
-							dma.channels[i].tableAddr, dma.channels[i].aBank,
+							dma.channels[i].tableAddr,
+							dma.channels[i].aBank,
 							dma.channels[i].bAddr+byte(bAddrOffsets[dma.channels[i].mode][j]),
 							dma.channels[i].fromB)
 						dma.channels[i].tableAddr++

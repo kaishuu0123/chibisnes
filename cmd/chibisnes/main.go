@@ -3,10 +3,12 @@ package main
 import (
 	"encoding/binary"
 	"flag"
+	"fmt"
 	"image"
 	"log"
 	"math"
 	"os"
+	"strings"
 	"unsafe"
 
 	"github.com/go-gl/glfw/v3.3/glfw"
@@ -28,8 +30,8 @@ var (
 		imgui.WindowFlagsNoMove |
 		imgui.WindowFlagsNoResize |
 		imgui.WindowFlagsHorizontalScrollbar
-	isRunning = false
-
+	isRunning                      = false
+	console     *chibisnes.Console = nil
 	audioDevice sdl.AudioDeviceID
 	audioBuffer [735 * 4]int16 // *2 for stereo, *2 for sizeof(int16)
 )
@@ -46,25 +48,16 @@ func main() {
 	if len(flag.Args()) >= 1 {
 		_, err := os.Stat(flag.Arg(0))
 		if err != nil {
-			log.Fatalln("no SNES ROM file specified or found")
+			log.Fatalln("no ROM file specified or found")
 		}
+
+		ResetConsole(flag.Arg(0))
 	}
+	defer StopAudio()
 
 	window := gui.NewMasterWindow("ChibiSNES", WINDOW_WIDTH, WINDOW_HEIGHT, -1)
+	window.SetDropCallback(onDrop)
 	screenImage := image.NewRGBA(image.Rect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT))
-
-	console := chibisnes.NewConsole()
-
-	romFilePath := flag.Arg(0)
-	data, err := readFile(romFilePath)
-	if err != nil {
-		log.Fatalf("readFile error: %s\n", err)
-	}
-	if err := console.LoadROM(romFilePath, data, len(data)); err != nil {
-		log.Fatalf("%s\n", err)
-	}
-
-	initAudio()
 
 	var texture imgui.TextureID
 	for !window.Platform.ShouldStop() {
@@ -73,59 +66,64 @@ func main() {
 		if window.Platform.Window.GetKey(glfw.KeyL) == glfw.Press {
 			console.Debug = !console.Debug
 		}
-		processInputController1(window.Platform.Window, console)
-		// want to more keys
-		// processInputController2(window.Platform.Window, console)
 
-		console.RunFrame()
+		if isRunning {
+			processInputController1(window.Platform.Window, console)
+			// want to more keys
+			// processInputController2(window.Platform.Window, console)
 
-		// clear screen
-		for i := 0; i < len(screenImage.Pix); i++ {
-			screenImage.Pix[i] = 0
+			console.RunFrame()
+
+			// clear screen
+			for i := 0; i < len(screenImage.Pix); i++ {
+				screenImage.Pix[i] = 0
+			}
+
+			console.SetPixels(screenImage.Pix)
 		}
-
-		console.SetPixels(screenImage.Pix)
 
 		texture, _ = window.Renderer.CreateImageTexture(screenImage)
 		renderGUI(window, &texture)
 		window.Renderer.ReleaseImage(texture)
 
-		PlayAudio(console)
+		if isRunning {
+			PlayAudio(console)
+		}
 	}
 
 	console.Close()
 }
 
-func readFile(path string) ([]byte, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	stat, err := file.Stat()
-	if err != nil {
-		return nil, err
-	}
-
-	data := make([]byte, stat.Size())
-	if err := binary.Read(file, binary.LittleEndian, data); err != nil {
-		return nil, err
-	}
-
-	return data, nil
+func onDrop(names []string) {
+	var sb strings.Builder
+	sb.WriteString(fmt.Sprintf("%s", names[0]))
+	dropInFiles := sb.String()
+	ResetConsole(dropInFiles)
 }
 
 func renderGUI(w *gui.MasterWindow, texture *imgui.TextureID) {
 	w.Platform.NewFrame()
 	imgui.NewFrame()
 
-	imgui.BackgroundDrawList().
-		AddImage(
-			*texture,
-			imgui.Vec2{X: 0, Y: 0},
-			imgui.Vec2{X: float32(WINDOW_WIDTH), Y: float32(WINDOW_HEIGHT)},
-		)
+	if isRunning {
+		imgui.BackgroundDrawList().
+			AddImage(
+				*texture,
+				imgui.Vec2{X: 0, Y: 0},
+				imgui.Vec2{X: float32(WINDOW_WIDTH), Y: float32(WINDOW_HEIGHT)},
+			)
+	} else {
+		var msg string = "ChibiSNES is currently stopped.\n\nPlease drag and drop ROM file."
+		textSize := imgui.CalcTextSize(msg, false, 0)
+		xpos := (float32(WINDOW_WIDTH) - textSize.X) / 2
+		ypos := (float32(WINDOW_HEIGHT) - textSize.Y) / 2
+		imgui.ForegroundDrawList().
+			AddText(
+				imgui.Vec2{X: xpos, Y: ypos},
+				imgui.PackedColor(0xFFFFFFFF),
+				msg,
+			)
+	}
 
 	imgui.Render()
 
@@ -134,7 +132,21 @@ func renderGUI(w *gui.MasterWindow, texture *imgui.TextureID) {
 	w.Platform.PostRender()
 }
 
-func initAudio() {
+func PlayAudio(console *chibisnes.Console) {
+	console.SetAudioSamples(audioBuffer[:], 735)
+	if sdl.GetQueuedAudioSize(audioDevice) <= uint32(len(audioBuffer)*6) {
+		src := (*[len(audioBuffer) * 2]uint8)(unsafe.Pointer(&audioBuffer[0]))
+		dst := make([]uint8, len(audioBuffer)*2)
+		volume := int(math.Floor(float64(sdl.MIX_MAXVOLUME) * AUDIO_MASTER_VOLUME))
+
+		sdl.MixAudioFormat(&dst[0], &src[0], sdl.AUDIO_S16, uint32(len(audioBuffer)*2), volume)
+
+		// don't queue audio if buffer is still filled
+		sdl.QueueAudio(audioDevice, dst[:len(audioBuffer)])
+	}
+}
+
+func StartAudio() {
 	err := sdl.InitSubSystem(sdl.INIT_AUDIO)
 	if err != nil {
 		log.Fatalf("Failed to init SDL: %s\n", err)
@@ -153,18 +165,30 @@ func initAudio() {
 	sdl.PauseAudioDevice(audioDevice, false)
 }
 
-func PlayAudio(console *chibisnes.Console) {
-	console.SetAudioSamples(audioBuffer[:], 735)
-	if sdl.GetQueuedAudioSize(audioDevice) <= uint32(len(audioBuffer)*6) {
-		src := (*[len(audioBuffer) * 2]uint8)(unsafe.Pointer(&audioBuffer[0]))
-		dst := make([]uint8, len(audioBuffer)*2)
-		volume := int(math.Floor(float64(sdl.MIX_MAXVOLUME) * AUDIO_MASTER_VOLUME))
-
-		sdl.MixAudioFormat(&dst[0], &src[0], sdl.AUDIO_S16, uint32(len(audioBuffer)*2), volume)
-
-		// don't queue audio if buffer is still filled
-		sdl.QueueAudio(audioDevice, dst[:len(audioBuffer)])
+func StopAudio() {
+	if isRunning {
+		sdl.QuitSubSystem(sdl.INIT_AUDIO)
 	}
+}
+
+func ResetConsole(file_name string) {
+	StopAudio()
+	isRunning = false
+
+	log.Println("Reset Console")
+	log.Printf("ROM file path: %s\n", file_name)
+	console = chibisnes.NewConsole()
+	romFilePath := file_name
+	data, err := readFile(romFilePath)
+	if err != nil {
+		log.Fatalf("readFile error: %s\n", err)
+	}
+	if err := console.LoadROM(romFilePath, data, len(data)); err != nil {
+		log.Fatalf("%s\n", err)
+	}
+	isRunning = true
+
+	StartAudio()
 }
 
 func processInputController1(window *glfw.Window, console *chibisnes.Console) {
@@ -199,3 +223,23 @@ func processInputController1(window *glfw.Window, console *chibisnes.Console) {
 // 	result[chibines.ButtonRight] = window.GetKey(glfw.KeyL) == glfw.Press
 // 	return result
 // }
+
+func readFile(path string) ([]byte, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	stat, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
+
+	data := make([]byte, stat.Size())
+	if err := binary.Read(file, binary.LittleEndian, data); err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
