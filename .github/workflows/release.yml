@@ -32,11 +32,12 @@ jobs:
           sudo apt-get -qq install -y libx11-dev xorg-dev libglu1-mesa libglu1-mesa-dev libgl1-mesa-glx libgl1-mesa-dev
           sudo apt-get -qq install -y libglfw3 libglfw3-dev
           sudo apt-get -qq install -y portaudio19-dev
+          sudo apt-get -qq install -y libsdl2-dev
 
       - name: Get MacOS dev libraries and tools
         if: matrix.os == 'macos-latest'
         run: |
-          brew install pkg-config portaudio glfw
+          brew install pkg-config portaudio glfw sdl2
 
       - name: Get Windows dev libraries and tools
         if: matrix.os == 'windows-latest'
@@ -50,6 +51,7 @@ jobs:
             mingw-w64-x86_64-pkgconf
             mingw-w64-x86_64-portaudio
             mingw-w64-x86_64-glfw
+            mingw-w64-x86_64-SDL2
 
       - name: Build Linux app
         if: matrix.os == 'ubuntu-latest'
@@ -84,6 +86,7 @@ jobs:
           cp /mingw64/bin/libssp-0.dll _release/
           cp /mingw64/bin/libstdc++-6.dll _release/
           cp /mingw64/bin/libwinpthread-1.dll _release/
+          cp /mingw64/bin/SDL2.dll _release/
 
       - name: Save built app for upload
         uses: actions/upload-artifact@v3
