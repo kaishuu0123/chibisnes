@@ -334,7 +334,7 @@ func (dsp *DSP) handleGain(ch int) {
 			dsp.channel[ch].gain -= 32
 			// decreasing below 0 will underflow to above 0x7ff
 			if dsp.channel[ch].gain > 0x7ff {
-				dsp.channel[ch].gain = 0x7ff
+				dsp.channel[ch].gain = 0
 			}
 		case 1:
 			// exponential decrease

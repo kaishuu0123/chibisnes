@@ -21,7 +21,7 @@ func (cpu *CPU) doOpcode(opcode byte) {
 		// cop imm(s)
 		cpu.readOpcode()
 		cpu.pushByte(cpu.k)
-		cpu.pushByte(byte(cpu.pc))
+		cpu.pushWord(cpu.pc)
 		cpu.pushByte(cpu.Flags())
 		cpu.cyclesUsed++ // native mode: 1 extra cycle
 		cpu.SetFlags(CPUFlagsInterrupt)

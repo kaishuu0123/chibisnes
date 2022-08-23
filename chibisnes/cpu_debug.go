@@ -112,7 +112,7 @@ func (cpu *CPU) getProcessorStateCPU() string {
 	disLine := cpu.getDisassemblyCPU()
 
 	return fmt.Sprintf(
-		"CPU %02x:%04x %-11s A:%04x X:%04x Y:%04x SP:%04x DP:%04x DB:%02x %s %s%s%s%s%s%s%s%s CYC: %d",
+		"CPU %02x:%04x %-11s A:%04x X:%04x Y:%04x SP:%04x DP:%04x DB:%02x %s %s%s%s%s%s%s%s%s",
 		cpu.k, cpu.pc, disLine, cpu.a, cpu.x, cpu.y,
 		cpu.sp, cpu.dp, cpu.db,
 		eChar,
@@ -124,7 +124,6 @@ func (cpu *CPU) getProcessorStateCPU() string {
 		iChar,
 		zChar,
 		cChar,
-		cpu.cycleCounter,
 	)
 }
 

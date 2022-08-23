@@ -798,7 +798,7 @@ func (console *Console) SetButtonState(player int, button int, pressed bool) {
 
 func (console *Console) debugPrint() {
 	console.catchupAPU()
-	if console.DMA.hdmaTimer > 0 || console.DMA.dmaBusy {
+	if console.DMA.hdmaTimer > 0 || console.DMA.dmaBusy || (console.hPos >= 536 && console.hPos < 576) {
 		// nothing done
 	} else {
 		if console.cpuCyclesLeft == 0 {
