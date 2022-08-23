@@ -31,13 +31,12 @@ jobs:
           sudo apt-get -qq install -y make pkg-config
           sudo apt-get -qq install -y libx11-dev xorg-dev libglu1-mesa libglu1-mesa-dev libgl1-mesa-glx libgl1-mesa-dev
           sudo apt-get -qq install -y libglfw3 libglfw3-dev
-          sudo apt-get -qq install -y portaudio19-dev
           sudo apt-get -qq install -y libsdl2-dev
 
       - name: Get MacOS dev libraries and tools
         if: matrix.os == 'macos-latest'
         run: |
-          brew install pkg-config portaudio glfw sdl2
+          brew install pkg-config glfw sdl2
 
       - name: Get Windows dev libraries and tools
         if: matrix.os == 'windows-latest'
@@ -49,7 +48,6 @@ jobs:
           install: >
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-pkgconf
-            mingw-w64-x86_64-portaudio
             mingw-w64-x86_64-glfw
             mingw-w64-x86_64-SDL2
 
@@ -63,8 +61,8 @@ jobs:
         run: |
           mkdir -p build/macosx/ChibiSNES.app/Contents/MacOS/
           CGO_ENABLED=1 go build -o build/macosx/ChibiSNES.app/Contents/MacOS/chibisnes cmd/chibisnes/main.go
-          cp /usr/local/opt/portaudio/lib/libportaudio.2.dylib build/macosx/ChibiSNES.app/Contents/MacOS/
-          install_name_tool -change /usr/local/opt/portaudio/lib/libportaudio.2.dylib @executable_path/libportaudio.2.dylib build/macosx/ChibiSNES.app/Contents/MacOS/chibisnes
+          cp /usr/local/opt/sdl2/lib/libSDL2-2.0.0.dylib build/macosx/ChibiSNES.app/Contents/MacOS/
+          install_name_tool -change /usr/local/opt/sdl2/lib/libSDL2-2.0.0.dylib @executable_path/libSDL2-2.0.0.dylib build/macosx/ChibiSNES.app/Contents/MacOS/chibisnes
           mkdir _release
           cp -r build/macosx/ChibiSNES.app _release/ChibiSNES.app
           chmod +x _release/ChibiSNES.app/Contents/MacOS/chibisnes
@@ -80,8 +78,6 @@ jobs:
           cp /mingw64/bin/libgmp-10.dll _release/
           cp /mingw64/bin/libgmpxx-4.dll _release/
           cp /mingw64/bin/libgomp-1.dll _release/
-          cp /mingw64/bin/libportaudio.dll _release/
-          cp /mingw64/bin/libportaudiocpp.dll _release/
           cp /mingw64/bin/libquadmath-0.dll _release/
           cp /mingw64/bin/libssp-0.dll _release/
           cp /mingw64/bin/libstdc++-6.dll _release/
