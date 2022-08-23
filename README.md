@@ -13,7 +13,7 @@ Based on [LakeSNES](https://github.com/elzo-d/LakeSnes). It also has some bug fi
   - [`cmd/chibisnes` (SNES Console)](#cmdchibisnes-snes-console)
 - [Spec](#spec)
 - [Key binding](#key-binding)
-  - [Documents](#documents)
+- [Documents](#documents)
 - [License](#license)
 
 ## Screenshots
@@ -66,7 +66,7 @@ Player 1
 | L | A |
 | R | F |
 
-### Documents
+## Documents
 
 - [SNES Development Wiki | Super Famicom Development Wiki](https://wiki.superfamicom.org/)
 - [Fullsnes - Nocash SNES Specs](https://problemkaputt.de/fullsnes.htm)
