@@ -1,5 +1,10 @@
 # ChibiSNES <!-- omit in toc -->
 
+[![Godoc Reference](https://pkg.go.dev/badge/github.com/kaishuu0123/chibisnes)](https://pkg.go.dev/github.com/kaishuu0123/chibisnes)
+[![GitHub Release](https://img.shields.io/github/v/release/kaishuu0123/chibisnes)](https://github.com/kaishuu0123/chibisnes/releases)
+[![Github Actions Release Workflow](https://github.com/kaishuu0123/chibisnes/actions/workflows/release.yml/badge.svg)](https://github.com/kaishuu0123/chibisnes/actions/workflows/release.yml)
+[![Go Report Card](https://goreportcard.com/badge/kaishuu0123/chibisnes)](https://goreportcard.com/report/kaishuu0123/chibisnes)
+
 ChibiSNES is SNES emulator written by Go. This is my favorite hobby project!
 
 Based on [LakeSNES](https://github.com/elzo-d/LakeSnes). It also has some bug fixes.
