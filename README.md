@@ -4,10 +4,18 @@ ChibiSNES is SNES emulator written by Go. This is my favorite hobby project!
 
 Based on [LakeSNES](https://github.com/elzo-d/LakeSnes). It also has some bug fixes.
 
+- [Screenshots](#screenshots)
+  - [`cmd/chibisnes` (SNES Console)](#cmdchibisnes-snes-console)
 - [Spec](#spec)
 - [Key binding](#key-binding)
   - [Documents](#documents)
 - [Credit](#credit)
+
+## Screenshots
+
+### `cmd/chibisnes` (SNES Console)
+
+![Screenshots](https://raw.github.com/kaishuu0123/chibisnes/main/screenshots/screenshots001.jpg)
 
 ## Spec
 
