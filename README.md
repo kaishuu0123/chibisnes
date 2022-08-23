@@ -14,7 +14,7 @@ Based on [LakeSNES](https://github.com/elzo-d/LakeSnes). It also has some bug fi
 - [Spec](#spec)
 - [Key binding](#key-binding)
   - [Documents](#documents)
-- [Credit](#credit)
+- [License](#license)
 
 ## Screenshots
 
@@ -75,7 +75,9 @@ Player 1
 - [elzo-d/LakeSnes: A SNES emulator, in C](https://github.com/elzo-d/LakeSnes)
 - [pokemium/snes-docs-ja: WIP: SNES、スーファミ(SFC)の日本語リファレンスです](https://github.com/pokemium/snes-docs-ja)
 
-## Credit
+## License
 
-- Font
-  - [itouhiro/PixelMplus](https://github.com/itouhiro/PixelMplus)
+- [elzo-d/LakeSnes: A SNES emulator, in C](https://github.com/elzo-d/LakeSnes)
+  - [MIT License](https://github.com/elzo-d/LakeSnes/blob/main/LICENSE.txt)
+- [itouhiro/PixelMplus](https://github.com/itouhiro/PixelMplus)
+  - [M+ FONT LICENSE](https://github.com/itouhiro/PixelMplus/blob/master/misc/mplus_bitmap_fonts/LICENSE_E)
