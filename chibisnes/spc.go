@@ -199,7 +199,7 @@ func (spc *SPC) addrIdx() uint16 {
 	lowBase := uint16(pointer) + uint16(spc.x)
 	high := uint16(spc.p) << 8
 
-	return spc.readWord((lowBase&0xff)|(high<<8), ((lowBase+1)&0xff)|(high))
+	return spc.readWord((lowBase&0xff)|(high), ((lowBase+1)&0xff)|(high))
 }
 
 func (spc *SPC) addrImm() uint16 {
