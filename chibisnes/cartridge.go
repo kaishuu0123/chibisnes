@@ -158,5 +158,7 @@ func (cartridge *Cartridge) writeHiROM(bank byte, addr uint16, value byte) {
 }
 
 func (cartridge *Cartridge) Close() {
-	cartridge.ram.Close()
+	if cartridge.ram != nil {
+		cartridge.ram.Close()
+	}
 }
